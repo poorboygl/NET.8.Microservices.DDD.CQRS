@@ -1,0 +1,2 @@
+https://github.com/mehmetozkaya/eshopMicroservices
+https://medium.com/@mehmetozkaya/net-8-microservices-ddd-cqrs-vertical-clean-architecture-2dd7ebaaf4bd
