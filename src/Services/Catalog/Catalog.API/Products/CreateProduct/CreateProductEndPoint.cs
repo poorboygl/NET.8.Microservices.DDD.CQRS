@@ -1,4 +1,6 @@
-﻿namespace Catalog.API.Products.CreateProduct;
+﻿using System;
+
+namespace Catalog.API.Products.CreateProduct;
 
 public class CreateProductEndPoint
 {
