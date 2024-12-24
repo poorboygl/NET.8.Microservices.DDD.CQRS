@@ -3,3 +3,5 @@ https://medium.com/@mehmetozkaya/net-8-microservices-ddd-cqrs-vertical-clean-arc
 
 https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling?view=aspnetcore-8.0#exception-handler-lambda
 https://martendb.io/documents/querying/linq/paging
+
+https://github.com/Xabaril/AspNetCore.Diagnostics.HealthChecks
