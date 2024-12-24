@@ -2,3 +2,4 @@ https://github.com/mehmetozkaya/eshopMicroservices
 https://medium.com/@mehmetozkaya/net-8-microservices-ddd-cqrs-vertical-clean-architecture-2dd7ebaaf4bd
 
 https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling?view=aspnetcore-8.0#exception-handler-lambda
+https://martendb.io/documents/querying/linq/paging
