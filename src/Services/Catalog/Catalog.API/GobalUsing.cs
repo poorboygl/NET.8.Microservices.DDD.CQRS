@@ -9,3 +9,5 @@ global using FluentValidation;
 global using BuildingBlock.Exceptions;
 global using BuildingBlock.Behaviors;
 global using BuildingBlock.Exceptions.Handler;
+global using Catalog.API.Data;
+
