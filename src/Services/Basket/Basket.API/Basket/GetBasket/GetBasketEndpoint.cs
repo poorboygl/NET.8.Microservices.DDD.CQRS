@@ -1,9 +1,4 @@
-﻿
-
-
-using Mapster;
-
-namespace Basket.API.Basket.GetBasket;
+﻿namespace Basket.API.Basket.GetBasket;
 //public record GetBasketRequest(string Username);
 public record GetBasketResponse(ShoppingCart Cart);
 public class GetBasketEndpoint : ICarterModule
