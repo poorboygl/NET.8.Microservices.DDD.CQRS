@@ -13,7 +13,6 @@ builder.Services.AddMediatR(config =>
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
 
 // Configure the HTTP request pipeline
 app.MapCarter();
