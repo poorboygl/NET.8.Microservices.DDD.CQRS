@@ -23,6 +23,12 @@ services:
     volumes:
       - postgres_basket:/var/lib/postgresql/data/
 
+  distributedcache:
+    container_name: distributedcache
+    restart: always
+    ports:
+    - "6379:6379"
+
   pgadmin:
     container_name: pgAdmin
     image: dpage/pgadmin4:latest
