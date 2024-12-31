@@ -16,7 +16,7 @@ public class DiscountService
         var coupon = await dbContext
                     .Coupons
                     .FirstOrDefaultAsync(x => x.ProductName == request.ProductName);
-        if (coupon == null)
+        if (coupon is null)
             coupon = new Coupon { ProductName = "No discount", Amount = 0, Description = "No Discount Desc" };
 
         logger.LogInformation("Discount is  retrieved for ProductName: {productName}, Amount : {amount}", coupon.ProductName, coupon.Amount);
@@ -28,7 +28,7 @@ public class DiscountService
     public override async Task<CouponModel> CreateDiscount(CreateDiscountRequest request, ServerCallContext context)
     {
         var coupon = request.Coupon.Adapt<Coupon>();
-        if (coupon == null)
+        if (coupon is null)
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request object."));
 
         dbContext.Coupons.Add(coupon);
@@ -40,9 +40,17 @@ public class DiscountService
         return coupleModel;
     }
 
-    public override Task<CouponModel> UpdateDiscount(UpdateDiscountRequest request, ServerCallContext context)
+    public override async Task<CouponModel> UpdateDiscount(UpdateDiscountRequest request, ServerCallContext context)
     {
-        return base.UpdateDiscount(request, context);
+        var coupon = request.Coupon.Adapt<Coupon>();
+        if (coupon is null)
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request object"));
+        dbContext.Coupons.Update(coupon);
+        await dbContext.SaveChangesAsync();
+
+        logger.LogInformation("Discount is successfully updated. ProductName: {ProductName}", coupon.ProductName);
+        var coupleModel = coupon.Adapt<CouponModel>();
+        return coupleModel;
     }
 
     public override Task<DeleteDiscountResponse> DeleteDiscount(DeleteDiscountRequest request, ServerCallContext context)
