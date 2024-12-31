@@ -16,6 +16,8 @@ internal class StoreBasketCommandHandler
 {
     public async Task<StoreBasketResult> Handle(StoreBasketCommand command, CancellationToken cancellationToken)
     {
+        //TODO:  comunicate  with Discount.Gprc  and calculate  lastest price  of product into sc
+
         ShoppingCart cart = command.Cart;
         //TODO: store basket in database (Use marten upsert- if exits = update
         await repository.StoreBasket(command.Cart, cancellationToken);
