@@ -1,22 +1,23 @@
-
-
 using Discount.Grpc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// add services  to the container
+// Enable HTTP/2 unencrypted support (for development purposes)
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
-//application Services
+// Add services to the container
+
+// Application Services
 var assembly = typeof(Program).Assembly;
 builder.Services.AddCarter();
-builder.Services.AddMediatR(config => 
+builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssembly(assembly);
     config.AddOpenBehavior(typeof(ValidationBehavior<,>));
     config.AddOpenBehavior(typeof(LoggingBehavior<,>));
 });
 
-//Data Services
+// Data Services
 builder.Services.AddMarten(opts =>
 {
     opts.Connection(builder.Configuration.GetConnectionString("Database")!);
@@ -25,37 +26,59 @@ builder.Services.AddMarten(opts =>
 
 builder.Services.AddScoped<IBasketRepository, BasketRepository>();
 builder.Services.Decorate<IBasketRepository, CachedBasketRepository>();
-//builder.Services.AddScoped<IBasketRepository>(provider =>
-//{
-//    var basketRepository = provider.GetRequiredService<BasketRepository>();
-//    return new CachedBasketRepository(basketRepository, provider.GetRequiredService<IDistributedCache>());
-//});
 builder.Services.AddStackExchangeRedisCache(option =>
 {
     option.Configuration = builder.Configuration.GetConnectionString("Redis");
-    //option.InstanceName = "Basket";
 });
+
+// gRPC Services with custom HttpClientHandler for certificate validation fix ssl
+//var handler = new HttpClientHandler
+//{
+//    ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => true
+//};
+
+//builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(option =>
+//{
+//    option.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
+//}).ConfigurePrimaryHttpMessageHandler(() => handler);
 
 //Grpc Services
-builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(option =>
+
+//Teacher fix
+builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(options =>
 {
-    option.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
+    options.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
+})
+.ConfigurePrimaryHttpMessageHandler(() =>
+{
+    var handler = new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback =
+        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    };
+
+    return handler;
 });
 
-//Cross-Cutting Services
+// Cross-Cutting Services
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 builder.Services.AddHealthChecks()
     .AddNpgSql(builder.Configuration.GetConnectionString("Database")!)
     .AddRedis(builder.Configuration.GetConnectionString("Redis")!);
+
+// Build the app
 var app = builder.Build();
+
 // Configure the HTTP request pipeline
 app.MapCarter();
+
 app.UseExceptionHandler(opts =>
 {
-
+    // Custom exception handling logic
 });
-app.UseHealthChecks("/health", 
+
+app.UseHealthChecks("/health",
     new HealthCheckOptions
     {
         ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
