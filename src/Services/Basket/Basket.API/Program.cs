@@ -40,7 +40,7 @@ builder.Services.AddStackExchangeRedisCache(option =>
 builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(option =>
 {
     option.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
-})
+});
 
 //Cross-Cutting Services
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
