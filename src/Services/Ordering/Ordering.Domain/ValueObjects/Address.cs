@@ -9,4 +9,30 @@ public record Address
     public string Country { get; } = default!;
     public string State { get; } = default!;
     public string ZipCode { get; } = default!;
+
+    protected Address()
+    {
+
+    }
+
+    private Address(string firstName, string lastName,string emailAddress, 
+                    string addressLine, string country, string state, string zipcode)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        EmailAddress = emailAddress;
+        AddressLine = addressLine;
+        Country = country;
+        State = state;
+        ZipCode = zipcode;
+    }
+
+    public static Address Of(string firstName, string lastName, string emailAddress,
+                    string addressLine, string country, string state, string zipcode)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(emailAddress);
+        ArgumentException.ThrowIfNullOrWhiteSpace(addressLine);
+
+        return new Address(firstName,lastName,emailAddress,addressLine, country, state, zipcode);
+    }
 }
