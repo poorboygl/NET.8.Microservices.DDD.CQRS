@@ -15,6 +15,7 @@ dotnet tool install --global dotnet-ef
 
 dotnet ef migrations add InitialCreate -o Data/Migrations -p Ordering.Infrastructure -s Ordering.API
 
+CD Folder Ordering and run
 dotnet ef migrations add "InitialCreate" --project Ordering.Infrastructure --startup-project Ordering.API --output-dir Data\Migrations
 dotnet ef migrations remove --project Ordering.Infrastructure --startup-project Ordering.API 
 dotnet ef database update --project Ordering.Infrastructure --startup-project Ordering.API 
