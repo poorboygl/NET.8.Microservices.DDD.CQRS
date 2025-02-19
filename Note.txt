@@ -20,3 +20,5 @@ dotnet ef migrations add "InitialCreate" --project Ordering.Infrastructure --sta
 dotnet ef migrations remove --project Ordering.Infrastructure --startup-project Ordering.API 
 dotnet ef database update --project Ordering.Infrastructure --startup-project Ordering.API 
 
+docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d
+
