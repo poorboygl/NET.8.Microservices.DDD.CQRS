@@ -22,3 +22,4 @@ dotnet ef database update --project Ordering.Infrastructure --startup-project Or
 
 docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d
 
+https://i.am.ai/roadmap/#note
