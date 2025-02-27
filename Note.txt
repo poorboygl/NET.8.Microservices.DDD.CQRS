@@ -25,3 +25,4 @@ docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d
 https://i.am.ai/roadmap/#note
 https://github.com/dotnet/eShop
 
+https://learn.microsoft.com/en-us/aspnet/web-api/overview/advanced/httpclient-message-handlers
