@@ -1,26 +1,10 @@
-using System.Reflection;
+using Common.Logging;
 using Serilog;
-using Serilog.Sinks.Elasticsearch;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Serilog
-Log.Logger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .Enrich.WithMachineName()
-    .WriteTo.Console()
-    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(builder.Configuration["ElasticConfiguration:Uri"]!))
-    {
-        AutoRegisterTemplate = true, // Ensure index template is registered
-        IndexFormat = $"applogs-{Assembly.GetExecutingAssembly().GetName().Name?.ToLower().Replace(".","-")}-" +
-        $"{builder.Environment.EnvironmentName?.ToLower().Replace(".", "-")}-" +
-        $"logs-{DateTime.UtcNow:yyyy-MM}", // Custom index format
-        NumberOfShards = 2,
-        NumberOfReplicas =1 
-    })
-    .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName)
-    .ReadFrom.Configuration(builder.Configuration)
-    .CreateLogger();
+// Configure Serilog using Common.Logging
+SeriLogger.ConfigureLogging(builder.Configuration, builder.Environment.EnvironmentName);
 
 // Use Serilog as the logging provider
 builder.Host.UseSerilog();
