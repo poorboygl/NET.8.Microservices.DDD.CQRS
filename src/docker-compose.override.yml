@@ -153,3 +153,16 @@ services:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
 
+
+  shopping.web:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080  # Force HTTP only
+      - ApiSettings__GatewayAddress=http://yarpapigateway:8080
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+    depends_on:
+      - yarpapigateway
+    ports:
+      - "6005:8080"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
