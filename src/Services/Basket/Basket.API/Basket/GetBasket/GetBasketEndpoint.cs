@@ -1,14 +1,19 @@
-﻿namespace Basket.API.Basket.GetBasket;
+﻿using Basket.API.Basket.CheckoutBasket;
+using Microsoft.AspNetCore.Http;
+
+namespace Basket.API.Basket.GetBasket;
 //public record GetBasketRequest(string Username);
 public record GetBasketResponse(ShoppingCart Cart);
-public class GetBasketEndpoint : ICarterModule
+public class GetBasketEndpoint(ILogger<CheckoutBasketEndpoints> logger) : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/basket/{userName}", async (string userName, ISender sender) =>
+        app.MapGet("/basket/{userName}", async (HttpContext httpContext, string userName, ISender sender) =>
         {
-            var result = await sender.Send(new GetBasketQuery(userName));
+            var requestUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.Path}";
+            logger.LogInformation("Sending request to {Url}", requestUrl);
 
+            var result = await sender.Send(new GetBasketQuery(userName));
             var response = result.Adapt<GetBasketResponse>();
 
             return Results.Ok(response);
