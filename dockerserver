@@ -1,0 +1,115 @@
+version: "3.9"
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: zookeeper
+    restart: always
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - mydockernetwork
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: kafka
+    restart: always
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    depends_on:
+      - zookeeper
+    networks:
+      - mydockernetwork
+
+  fix-permissions:
+    image: busybox
+    command: sh -c "chown -R 999:999 /data && chmod -R 775 /data"
+    volumes:
+      - /volume3/docker/NET.Microservices/mongodb/data:/data
+    restart: "no"
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    user: root
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=mongopw
+      - PUID=0
+      - PGID=0
+    volumes:
+      - /volume3/docker/NET.Microservices/mongodb/data:/data/db
+    networks:
+      - mydockernetwork
+    depends_on:
+      - fix-permissions
+
+  sqldb:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqldb
+    user: root
+    restart: always
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Str0ngS@P@ssw0rd02"
+      MSSQL_PID: "Express"
+    volumes:
+      - /volume3/docker/NET.Microservices/sqldb:/var/opt/mssql
+    networks:
+      - mydockernetwork
+
+  postgresdb:
+    image: postgres:alpine3.16
+    container_name: postgresdb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgresPsw
+      # - POSTGRES_DB=CustomerDb
+    restart: always
+    ports:
+      - "5433:5432"
+    volumes:
+      - /volume3/docker/NET.Microservices/postgresdb:/var/lib/postgresql/data
+    networks:
+      - mydockernetwork
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@zbuzz.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    restart: always
+    ports:
+      - "5050:80"
+    volumes:
+      - /volume3/docker/NET.Microservices/pgadmin_data:/root/.pgadmin
+    networks:
+      - mydockernetwork
+    depends_on: 
+      - mongodb
+
+networks:
+  mydockernetwork:
+    driver: bridge
